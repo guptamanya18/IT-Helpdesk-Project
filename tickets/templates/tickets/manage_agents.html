@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Manage Agents — IT Helpdesk{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h3><i class="bi bi-people me-2 text-brand"></i>Support Agents</h3>
+    <p class="page-subtitle">Manage agent accounts and their access status.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Agent list -->
+    <div class="col-md-7">
+        <div class="table-card">
+            <div class="card-header-section d-flex align-items-center justify-content-between">
+                <span class="section-title mb-0"><i class="bi bi-list-ul me-1"></i>All agents</span>
+                <span class="text-muted" style="font-size:0.8rem;">{{ agents|length }} total</span>
+            </div>
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for agent in agents %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-circle" style="width:34px;height:34px;">
+                                {{ agent.get_full_name|default:agent.username|first|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-600" style="font-size:0.9rem;">{{ agent.get_full_name|default:agent.username }}</div>
+                                <div class="text-muted" style="font-size:0.78rem;">@{{ agent.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-muted" style="font-size:0.85rem;">{{ agent.profile.department|default:"—" }}</td>
+                    <td>
+                        {% if agent.profile.is_active_agent %}
+                        <span class="badge-pill badge-resolved">
+                            <i class="bi bi-circle-fill me-1" style="font-size:0.5em;"></i>Active
+                        </span>
+                        {% else %}
+                        <span class="badge-pill badge-closed">
+                            <i class="bi bi-circle me-1" style="font-size:0.5em;"></i>Inactive
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'toggle_agent_active' agent.id %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm {% if agent.profile.is_active_agent %}btn-outline-danger{% else %}btn-outline-brand{% endif %}">
+                                {% if agent.profile.is_active_agent %}
+                                <i class="bi bi-pause-circle me-1"></i>Deactivate
+                                {% else %}
+                                <i class="bi bi-play-circle me-1"></i>Activate
+                                {% endif %}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5">
+                        <i class="bi bi-people d-block mb-2" style="font-size:2rem;opacity:0.25;color:var(--text-muted);"></i>
+                        <span class="text-muted">No agents yet — add one using the form.</span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add agent form -->
+    <div class="col-md-5">
+        <div class="ticket-card p-4">
+            <div class="section-title mb-3">
+                <i class="bi bi-person-plus me-1"></i>Add new agent
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <label class="form-label">First name</label>{{ form.first_name }}
+                    </div>
+                    <div class="col-6 mb-2">
+                        <label class="form-label">Last name</label>{{ form.last_name }}
+                    </div>
+                </div>
+                <div class="mb-2"><label class="form-label">Username</label>{{ form.username }}</div>
+                <div class="mb-2"><label class="form-label">Email</label>{{ form.email }}</div>
+                <div class="mb-2"><label class="form-label">Department</label>{{ form.department }}</div>
+                <div class="mb-2"><label class="form-label">Password</label>{{ form.password1 }}</div>
+                <div class="mb-3"><label class="form-label">Confirm password</label>{{ form.password2 }}</div>
+                <button type="submit" class="btn btn-brand w-100">
+                    <i class="bi bi-person-plus me-1"></i>Create agent account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

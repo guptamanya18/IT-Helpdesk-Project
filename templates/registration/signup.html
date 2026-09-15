@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — IT Helpdesk{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <div class="brand-icon-lg">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h4>Create your account</h4>
+                <p>Register as an employee to raise support tickets</p>
+            </div>
+            <div class="auth-card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">First name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Last name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-person me-1 text-brand"></i>Username
+                        </label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-envelope me-1 text-brand"></i>Email address
+                        </label>
+                        {{ form.email }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="bi bi-building me-1 text-brand"></i>Department
+                            <span class="text-muted fw-normal">(optional)</span>
+                        </label>
+                        {{ form.department }}
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-lock me-1 text-brand"></i>Password
+                            </label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                            <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Confirm password</label>
+                            {{ form.password2 }}
+                        </div>
+                    </div>
+                    {% for field in form %}
+                        {% if field.errors and field.name not in "first_name,last_name,username,email,department,password1,password2" %}
+                        <div class="text-danger small mb-2">{{ field.errors }}</div>
+                        {% endif %}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-brand w-100 mt-1">
+                        <i class="bi bi-person-check me-2"></i>Create Account
+                    </button>
+                </form>
+                <p class="text-center mt-3 mb-0" style="font-size:0.85rem; color:var(--text-muted);">
+                    Already have an account? <a href="{% url 'login' %}" class="fw-600">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

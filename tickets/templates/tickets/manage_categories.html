@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Manage Categories — IT Helpdesk{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h3><i class="bi bi-tags me-2 text-brand"></i>Ticket Categories</h3>
+    <p class="page-subtitle">Organise tickets by category to improve routing and reporting.</p>
+</div>
+
+<div class="row g-4">
+    <!-- Category list -->
+    <div class="col-md-7">
+        <div class="table-card">
+            <div class="card-header-section d-flex align-items-center justify-content-between">
+                <span class="section-title mb-0"><i class="bi bi-list-ul me-1"></i>All categories</span>
+                <span class="text-muted" style="font-size:0.8rem;">{{ categories|length }} total</span>
+            </div>
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Tickets</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for cat in categories %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand-bg),#ccfce7);color:var(--brand-deeper);font-size:0.85rem;border:1px solid var(--brand-border);">
+                                <i class="bi bi-tag-fill"></i>
+                            </div>
+                            <span class="fw-600" style="font-size:0.9rem;">{{ cat.name }}</span>
+                        </div>
+                    </td>
+                    <td class="text-muted" style="font-size:0.85rem;">{{ cat.description|default:"—" }}</td>
+                    <td>
+                        <span class="fw-600" style="font-size:0.9rem;">{{ cat.ticket_count }}</span>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'delete_category' cat.id %}"
+                              onsubmit="return confirm('Delete category \'{{ cat.name }}\'? This cannot be undone.');">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash me-1"></i>Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5">
+                        <i class="bi bi-tags d-block mb-2" style="font-size:2rem;opacity:0.25;color:var(--text-muted);"></i>
+                        <span class="text-muted">No categories yet — add one using the form.</span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add category form -->
+    <div class="col-md-5">
+        <div class="ticket-card p-4">
+            <div class="section-title mb-3">
+                <i class="bi bi-plus-circle me-1"></i>Add category
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-tag me-1 text-brand"></i>Category name
+                    </label>
+                    {{ form.name }}
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="bi bi-text-paragraph me-1 text-brand"></i>Description
+                        <span class="text-muted fw-normal">(optional)</span>
+                    </label>
+                    {{ form.description }}
+                </div>
+                <button type="submit" class="btn btn-brand w-100">
+                    <i class="bi bi-plus-lg me-1"></i>Add category
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Agent Dashboard — IT Helpdesk{% endblock %}
+{% block content %}
+
+<!-- Agent hero -->
+<div class="rounded-4 p-4 mb-4"
+     style="background: linear-gradient(135deg, var(--nav-bg) 0%, #0c1422 60%, #060f1a 100%);
+            border: 1px solid rgba(14,165,233,0.18);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.2);">
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <span style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:rgba(56,189,248,0.8);">
+            <i class="bi bi-circle-fill me-1" style="font-size:0.45em; vertical-align:middle;"></i>Agent Portal
+        </span>
+    </div>
+    <h3 class="mb-1" style="color:#fff; font-size:1.6rem; font-weight:800; letter-spacing:-0.5px;">
+        <i class="bi bi-headset me-2" style="color:#38bdf8;"></i>Support Queue
+    </h3>
+    <p class="mb-0" style="color:rgba(255,255,255,0.5); font-size:0.875rem;">
+        Tickets assigned to you and unassigned tickets waiting for pickup.
+    </p>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <div class="stat-card stat-card--amber">
+            <div class="stat-icon">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+            <div class="stat-number">{{ assigned_tickets|length }}</div>
+            <div class="stat-label">Assigned to You</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stat-card stat-card--rose">
+            <div class="stat-icon">
+                <i class="bi bi-inbox-fill"></i>
+            </div>
+            <div class="stat-number">{{ unassigned_tickets|length }}</div>
+            <div class="stat-label">Unassigned Queue</div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="stat-card stat-card--emerald">
+            <div class="stat-icon">
+                <i class="bi bi-check2-all"></i>
+            </div>
+            <div class="stat-number">{{ resolved_count }}</div>
+            <div class="stat-label">Resolved by You</div>
+        </div>
+    </div>
+</div>
+
+<!-- Assigned to you -->
+<div class="divider-label">
+    <i class="bi bi-person-check me-1"></i>Assigned to you
+</div>
+
+{% if assigned_tickets %}
+<div class="table-card mb-4">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Ticket</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Raised by</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ticket in assigned_tickets %}
+        <tr>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="ticket-number">{{ ticket.ticket_number }}</span>
+                    <span class="fw-500" style="font-size:0.88rem;">{{ ticket.title }}</span>
+                </div>
+            </td>
+            <td class="text-muted">{{ ticket.category }}</td>
+            <td><span class="badge-pill {{ ticket.priority_badge_class }}">{{ ticket.get_priority_display }}</span></td>
+            <td><span class="badge-pill {{ ticket.status_badge_class }}">{{ ticket.get_status_display }}</span></td>
+            <td class="text-muted" style="font-size:0.85rem;">{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}</td>
+            <td><a href="{% url 'ticket_detail' ticket.pk %}" class="btn btn-sm btn-outline-brand">Open <i class="bi bi-arrow-right ms-1"></i></a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="ticket-card mb-4">
+    <div class="empty-state">
+        <i class="bi bi-person-check empty-state-icon"></i>
+        <p>Nothing assigned to you right now.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Unassigned queue -->
+<div class="divider-label">
+    <i class="bi bi-inbox me-1"></i>Unassigned queue
+</div>
+
+{% if unassigned_tickets %}
+<div class="table-card">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Ticket</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Raised by</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ticket in unassigned_tickets %}
+        <tr>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="ticket-number">{{ ticket.ticket_number }}</span>
+                    <span class="fw-500" style="font-size:0.88rem;">{{ ticket.title }}</span>
+                </div>
+            </td>
+            <td class="text-muted">{{ ticket.category }}</td>
+            <td><span class="badge-pill {{ ticket.priority_badge_class }}">{{ ticket.get_priority_display }}</span></td>
+            <td class="text-muted" style="font-size:0.85rem;">{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}</td>
+            <td class="text-muted" style="font-size:0.82rem;">{{ ticket.created_at|timesince }} ago</td>
+            <td><a href="{% url 'ticket_detail' ticket.pk %}" class="btn btn-sm btn-brand">Pick up</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="ticket-card">
+    <div class="empty-state">
+        <i class="bi bi-stars empty-state-icon"></i>
+        <p>Queue is empty — great work!</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
